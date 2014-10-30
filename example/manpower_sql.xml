@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<manpowersql>
+    <query id ='EmployeeQuery'>
+		<INSERT>
+			INSERT INTO dbo.EMPLOYEE  (EMPLOYEE_ID, TITLE, NAME, SURNAME, NICKNAME, POSITION_CODE, GROUP_CODE) VALUES (?,?,?,?,?,?,?)
+		</INSERT>
+		<UPDATE> 
+			UPDATE EMPLOYEE SET TITLE=?, NAME=?,SURNAME=?,NICKNAME=?,POSITION_CODE=?,GROUP_CODE=? WHERE (EMPLOYEE_ID=?) 
+		</UPDATE>
+		<SELECT>
+			select t.EMPLOYEE_ID as EmpID,t.TITLE as title_Name,t.NAME,t.SURNAME,t.NICKNAME,t.POSITION_CODE,t.GROUP_CODE from dbo.EMPLOYEE t where (t.EMPLOYEE_ID =? or ? is null) and (t.NAME = ? or ? is null)  and (t.GROUP_CODE =? or ? is null) and (t.POSITION_CODE =? or ? is null);
+		</SELECT>
+                <DELETE>
+                        delete from dbo.EMPLOYEE where EMPLOYEE_ID=?;
+                </DELETE>
+		<SELECTBYID>
+			select t.EMPLOYEE_ID as EmpID,t.TITLE as title_Name,t.NAME,t.SURNAME,t.NICKNAME,t.POSITION_CODE,t.GROUP_CODE from dbo.EMPLOYEE t where t.EMPLOYEE_ID=?; 
+		</SELECTBYID>
+		<SELECTBYFILTER>
+			select t.EMPLOYEE_ID as EmpID,t.TITLE as title_Name,t.NAME,t.SURNAME,t.NICKNAME,t.POSITION_CODE,t.GROUP_CODE from dbo.EMPLOYEE t
+		</SELECTBYFILTER>
+		<SELECTLASTID>
+			SELECT top 1 EMPLOYEE_ID  FROM EMPLOYEE ORDER BY EMPLOYEE_ID DESC
+		</SELECTLASTID>
+	</query>	
+</manpowersql>
