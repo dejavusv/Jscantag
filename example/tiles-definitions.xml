@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+  
+    <definition name="loginLayout" template="/WEB-INF/template/template_login.jsp">
+        <put-attribute name="title" value="login_layout" />
+        <put-attribute name="body" value="" />
+        <!-- <put-attribute name="footer" value="/WEB-INF/template/footer.jsp" /> -->
+    </definition>
+    
+    <definition name="baseLayout" template="/WEB-INF/template/template_pivot.jsp">
+        <put-attribute name="title" value="base_layout" />
+        <put-attribute name="header" value="/WEB-INF/template/header.jsp" />
+        <put-attribute name="body" value="" />
+        <put-attribute name="footer" value="/WEB-INF/template/footerBase.jsp" />
+    </definition>
+    
+    <definition name="datatableLayout" template="/WEB-INF/template/template_main.jsp">
+        <put-attribute name="title" value="datatable_layout" />
+        <put-attribute name="header" value="/WEB-INF/template/header.jsp" />
+        <put-attribute name="body" value="" />
+        <put-attribute name="footer" value="/WEB-INF/template/footer.jsp" />
+    </definition>
+    
+    <definition name="criteriaLayout" template="/WEB-INF/template/template_criteria.jsp">
+        <put-attribute name="title" value="criteria_Layout" />
+        <put-attribute name="header" value="/WEB-INF/template/header.jsp" />
+        <put-attribute name="body" value="" />
+        <put-attribute name="footer" value="/WEB-INF/template/footer.jsp" />
+    </definition>
+    
+    
+    <definition name="login" extends="loginLayout">
+        <put-attribute name="title" value="Pivot Table : Login" />
+        <put-attribute name="body" value="/WEB-INF/jsp/login.jsp" />
+    </definition>
+  
+    <definition name="index" extends="baseLayout">
+        <put-attribute name="title" value="Pivot Table : Main" />
+        <put-attribute name="body" value="/WEB-INF/jsp/index.jsp" />
+    </definition>
+    
+    <definition name="manpower" extends="baseLayout">
+        <put-attribute name="title" value="Pivot Table : Manpower Report" />
+        <put-attribute name="body" value="/WEB-INF/jsp/manpower.jsp" />
+    </definition>
+    
+    <definition name="project" extends="datatableLayout">
+        <put-attribute name="title" value="Pivot Table : Project" />
+        <put-attribute name="body" value="/WEB-INF/jsp/project.jsp" />
+    </definition>
+    
+    <definition name="assign" extends="datatableLayout">
+        <put-attribute name="title" value="Pivot Table : AssignManPower" />
+        <put-attribute name="body" value="/WEB-INF/jsp/assign.jsp" />
+    </definition>
+    
+     <definition name="empList" extends="datatableLayout">
+        <put-attribute name="title" value="Pivot Table : Employee List" />
+        <put-attribute name="body" value="/WEB-INF/jsp/empList.jsp" />
+    </definition>
+    
+    <definition name="criteria" extends="criteriaLayout">
+        <put-attribute name="title" value="Pivot Table : Setting Criteria" />
+        <put-attribute name="body" value="/WEB-INF/jsp/criteria.jsp" />
+    </definition>
+    
+    <definition name="holiday" extends="datatableLayout">
+        <put-attribute name="title" value="Pivot Table : Holiday" />
+        <put-attribute name="body" value="/WEB-INF/jsp/holiday.jsp" />
+    </definition>
+  
+</tiles-definitions>

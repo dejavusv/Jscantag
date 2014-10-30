@@ -28,23 +28,34 @@ public class Jscantag {
     private static final String[] ACCESS_MODIFIERS = {"public", "private", "protected"};
     private static final String[] JAVA_KEYWORD = {"abstract", "continue", "for", "new", "switch", "assert", "default", "goto", "package", "synchronized", "boolean", "do", "if", "private", "this", "break", "double", "implements", "protected", "throw", "byte", "else", "import", "public", "throws", "case", "enum", "instanceof", "return", "transient", "catch", "extends", "int", "short", "try", "char", "final", "interface", "static", "void", "class", "finally", "long", "strictfp", "volatile", "const", "float", "native", "super", "while"
     };
-    private static final String pathFile = "C:\\Users\\Surachai\\Documents\\NetBeansProjects\\Jscantag\\example\\manpower_bean.xml";
+    private static final String pathFile = "C:\\Users\\Surachai\\Documents\\NetBeansProjects\\Jscantag\\example\\tiles-definitions.xml";
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         Jscantag h = new Jscantag();
-        h.getListIDFromSpringBeans(pathFile);
+        h.getListNameTemplateFromTile(pathFile);
+        
     }
+    
+    public List<String> getListNameTemplateFromTile(String pathfile){
+        List<String> ListTemplate = new LinkedList<String>();
+        NodeList node = getTagElement(pathfile,"definition");
+        List<String> TemplateList = getAttributeFromTagElement(node,"template");
+        List<String> nameTemplateList = getAttributeFromTagElement(node,"name");
+        for(int i=0;i<TemplateList.size();i++){
+            if(!"".equalsIgnoreCase(TemplateList.get(i))){   
+                ListTemplate.add(nameTemplateList.get(i));
+            }
+        }
+        return ListTemplate;
+    } 
     
     public List<String> getListIDFromSpringBeans(String pathfile){
         List<String> ListID = new LinkedList<String>();
-        NodeList node = getTagElement(pathFile,"bean");
+        NodeList node = getTagElement(pathfile,"bean");
         ListID = getAttributeFromTagElement(node,"id");
-        for (String temp : ListID) {
-            System.out.println(temp);
-	}
         return ListID;
     } 
 
