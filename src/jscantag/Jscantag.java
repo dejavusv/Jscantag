@@ -45,7 +45,13 @@ public class Jscantag {
     public static void main(String[] args) {
         Jscantag h = new Jscantag();
         //h.getListNameTemplateFromTile(pathFile);
-        h.getHTMLTagElement(pathHtml, "form");
+        HtmlNodeLink list = h.getHTMLTagElement(pathHtml, "form");
+        List<HtmlNode> data = list.getRootNodeList();
+       // System.out.println(data.get(0).getData());
+       // System.out.println(data.get(1).getData());
+        HtmlNodeLink fieldsetlist = h.getHTMLTagElement(data.get(0), "fieldset");
+        List<HtmlNode> fieldsetlistdata =  fieldsetlist.getRootNodeList();
+        System.out.println(fieldsetlistdata.get(0).getData());
     }
 
     public List<String> getListNameTemplateFromTile(String pathfile) {
@@ -96,17 +102,18 @@ public class Jscantag {
     }
 
     public HtmlNodeLink getHTMLTagElement(String pathfile, String tagname) {
-        HtmlNodeLink hList = new HtmlNodeLink();
         String content = "";
-        String dataInTag = "";
+        List<String> datafile = g.readFile(pathfile);
+        for (String data : datafile) {
+            content += data;
+        }
+        return AnalysisHTML(content, tagname);
+    }
 
+    public HtmlNodeLink AnalysisHTML(String content, String tagname) {
+        String dataInTag = content;
+        HtmlNodeLink hList = new HtmlNodeLink();
         try {
-            List<String> datafile = g.readFile(pathfile);
-            for (String data : datafile) {
-                content += data;
-            }
-            dataInTag = content;
-
             while (dataInTag.indexOf(tagname) != -1) {
                 int prefix = checkPrefixTagIndex(dataInTag, tagname);
                 if (prefix == -1) {
@@ -116,50 +123,45 @@ public class Jscantag {
                     HtmlNode node = new HtmlNode();
                     String supfix = setupSupfix(tagname);
                     String headertag = "";
-                    int checkTag =0;
+                    int checkTag = 0;
                     //get header tag
                     if ((supfix.equalsIgnoreCase(SUPFIXTAG2) && (dataInTag.indexOf(SUPFIXTAG1, prefix) + SUPFIXTAG1.length() < dataInTag.indexOf(SUPFIXTAG2, prefix) + SUPFIXTAG2.length()))) {
                         checkTag = 1;
                         supfix = SUPFIXTAG1;
                     }
-                    
+
                     headertag = dataInTag.substring(prefix, dataInTag.indexOf(supfix, prefix) + supfix.length());
                     System.out.println("headertag :" + headertag);
                     node.setAttibuteList(readAttbuteList(headertag, tagname, supfix));
-                    if(checkTag == 1){checkTag = 0;supfix = SUPFIXTAG2;}
-                    
+                    if (checkTag == 1) {
+                        checkTag = 0;
+                        supfix = SUPFIXTAG2;
+                    }
 
                     //get data in tag
                     if (!supfix.equalsIgnoreCase(SUPFIXTAG2)) {
+                        
                         String datatag = dataInTag.substring(dataInTag.indexOf(supfix, prefix) + supfix.length(), dataInTag.indexOf(STOP_PREFIXTAG + tagname + supfix));
                         //System.out.println("datatag :"+datatag);
-                        node.setData(datatag); 
+                        node.setData(datatag);
                         dataInTag = dataInTag.substring(dataInTag.indexOf(STOP_PREFIXTAG + tagname + supfix));
-                    }else{
-                        dataInTag = dataInTag.substring(dataInTag.indexOf(supfix)+supfix.length());
+                    } else {
+                        dataInTag = dataInTag.substring(dataInTag.indexOf(supfix) + supfix.length());
                     }
-                     
-                    //hList.
-                    
+
+                    hList.add(node);
+
                 }
 
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
         return hList;
     }
-    
-    public HtmlNodeLink getHTMLTagElement(HtmlNodeLink nodelist) {
-        HtmlNodeLink hList = new HtmlNodeLink();
-        try {
 
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return hList;
+    public HtmlNodeLink getHTMLTagElement(HtmlNode nodelist,String tagname) {
+        return AnalysisHTML(nodelist.getData(), tagname);
     }
 
     private String setupSupfix(String tagname) {

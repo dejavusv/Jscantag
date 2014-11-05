@@ -6,6 +6,7 @@
 
 package com.scan.html.model;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -15,6 +16,9 @@ import java.util.List;
 public class HtmlNodeLink {
     private List<HtmlNode> RootNodeList;
     
+    public HtmlNodeLink(){
+        RootNodeList = new LinkedList<HtmlNode>();
+    }
 
     public List<HtmlNode> getRootNodeList() {
         return RootNodeList;
