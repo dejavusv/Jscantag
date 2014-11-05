@@ -6,16 +6,18 @@
 package jscantag;
 
 import com.des.generate.GenerateFile;
+import com.scan.html.model.Attibute;
+import com.scan.html.model.HtmlNode;
+import com.scan.html.model.HtmlNodeLink;
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
 import org.w3c.dom.Element;
-import java.io.File;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -28,43 +30,50 @@ public class Jscantag {
     private static final String[] ACCESS_MODIFIERS = {"public", "private", "protected"};
     private static final String[] JAVA_KEYWORD = {"abstract", "continue", "for", "new", "switch", "assert", "default", "goto", "package", "synchronized", "boolean", "do", "if", "private", "this", "break", "double", "implements", "protected", "throw", "byte", "else", "import", "public", "throws", "case", "enum", "instanceof", "return", "transient", "catch", "extends", "int", "short", "try", "char", "final", "interface", "static", "void", "class", "finally", "long", "strictfp", "volatile", "const", "float", "native", "super", "while"
     };
+
     private static final String pathFile = "C:\\Users\\Surachai\\Documents\\NetBeansProjects\\Jscantag\\example\\tiles-definitions.xml";
+    private static final String pathHtml = "C:\\Users\\Surachai\\Documents\\NetBeansProjects\\Jscantag\\example\\empList.jsp";
+
+    private static final String START_PREFIXTAG = "<";
+    private static final String SUPFIXTAG1 = ">";
+    private static final String STOP_PREFIXTAG = "</";
+    private static final String SUPFIXTAG2 = "/>";
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         Jscantag h = new Jscantag();
-        h.getListNameTemplateFromTile(pathFile);
-        
+        //h.getListNameTemplateFromTile(pathFile);
+        h.getHTMLTagElement(pathHtml, "form");
     }
-    
-    public List<String> getListNameTemplateFromTile(String pathfile){
+
+    public List<String> getListNameTemplateFromTile(String pathfile) {
         List<String> ListTemplate = new LinkedList<String>();
-        NodeList node = getTagElement(pathfile,"definition");
-        List<String> TemplateList = getAttributeFromTagElement(node,"template");
-        List<String> nameTemplateList = getAttributeFromTagElement(node,"name");
-        for(int i=0;i<TemplateList.size();i++){
-            if(!"".equalsIgnoreCase(TemplateList.get(i))){   
+        NodeList node = getTagElement(pathfile, "definition");
+        List<String> TemplateList = getAttributeFromTagElement(node, "template");
+        List<String> nameTemplateList = getAttributeFromTagElement(node, "name");
+        for (int i = 0; i < TemplateList.size(); i++) {
+            if (!"".equalsIgnoreCase(TemplateList.get(i))) {
                 ListTemplate.add(nameTemplateList.get(i));
             }
         }
         return ListTemplate;
-    } 
-    
-    public List<String> getListIDFromSpringBeans(String pathfile){
-        List<String> ListID = new LinkedList<String>();
-        NodeList node = getTagElement(pathfile,"bean");
-        ListID = getAttributeFromTagElement(node,"id");
-        return ListID;
-    } 
+    }
 
-    public List<String> getAttributeFromTagElement(NodeList nList,String tagname) {
+    public List<String> getListIDFromSpringBeans(String pathfile) {
+        List<String> ListID = new LinkedList<String>();
+        NodeList node = getTagElement(pathfile, "bean");
+        ListID = getAttributeFromTagElement(node, "id");
+        return ListID;
+    }
+
+    public List<String> getAttributeFromTagElement(NodeList nList, String tagname) {
         List<String> Listdata = new LinkedList<String>();
         for (int temp = 0; temp < nList.getLength(); temp++) {
             Node nNode = nList.item(temp);
             if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                Element eElement = (Element) nNode;  
+                Element eElement = (Element) nNode;
                 Listdata.add(eElement.getAttribute(tagname));
             }
         }
@@ -84,6 +93,120 @@ public class Jscantag {
             e.printStackTrace();
         }
         return nList;
+    }
+
+    public HtmlNodeLink getHTMLTagElement(String pathfile, String tagname) {
+        HtmlNodeLink hList = new HtmlNodeLink();
+        String content = "";
+        String dataInTag = "";
+
+        try {
+            List<String> datafile = g.readFile(pathfile);
+            for (String data : datafile) {
+                content += data;
+            }
+            dataInTag = content;
+
+            while (dataInTag.indexOf(tagname) != -1) {
+                int prefix = checkPrefixTagIndex(dataInTag, tagname);
+                if (prefix == -1) {
+                    dataInTag = dataInTag.substring(dataInTag.indexOf(tagname) + tagname.length());
+
+                } else {
+                    HtmlNode node = new HtmlNode();
+                    String supfix = setupSupfix(tagname);
+                    String headertag = "";
+                    int checkTag =0;
+                    //get header tag
+                    if ((supfix.equalsIgnoreCase(SUPFIXTAG2) && (dataInTag.indexOf(SUPFIXTAG1, prefix) + SUPFIXTAG1.length() < dataInTag.indexOf(SUPFIXTAG2, prefix) + SUPFIXTAG2.length()))) {
+                        checkTag = 1;
+                        supfix = SUPFIXTAG1;
+                    }
+                    
+                    headertag = dataInTag.substring(prefix, dataInTag.indexOf(supfix, prefix) + supfix.length());
+                    System.out.println("headertag :" + headertag);
+                    node.setAttibuteList(readAttbuteList(headertag, tagname, supfix));
+                    if(checkTag == 1){checkTag = 0;supfix = SUPFIXTAG2;}
+                    
+
+                    //get data in tag
+                    if (!supfix.equalsIgnoreCase(SUPFIXTAG2)) {
+                        String datatag = dataInTag.substring(dataInTag.indexOf(supfix, prefix) + supfix.length(), dataInTag.indexOf(STOP_PREFIXTAG + tagname + supfix));
+                        //System.out.println("datatag :"+datatag);
+                        node.setData(datatag); 
+                        dataInTag = dataInTag.substring(dataInTag.indexOf(STOP_PREFIXTAG + tagname + supfix));
+                    }else{
+                        dataInTag = dataInTag.substring(dataInTag.indexOf(supfix)+supfix.length());
+                    }
+                     
+                    //hList.
+                    
+                }
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return hList;
+    }
+    
+    public HtmlNodeLink getHTMLTagElement(HtmlNodeLink nodelist) {
+        HtmlNodeLink hList = new HtmlNodeLink();
+        try {
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return hList;
+    }
+
+    private String setupSupfix(String tagname) {
+        if (tagname.equalsIgnoreCase("input")) {
+            return SUPFIXTAG2;
+        }
+        return SUPFIXTAG1;
+    }
+
+    private List<Attibute> readAttbuteList(String headertag, String tagname, String supfixtag) {
+        List<Attibute> AttList = new LinkedList<Attibute>();
+        //split header
+        String data = headertag.substring(headertag.indexOf(tagname) + tagname.length());
+        //split tailer
+        data = data.substring(0, data.indexOf(supfixtag));
+        //replace " '
+        data = data.replaceAll("\"", "");
+        data = data.replaceAll("'", "");
+        String[] pathAtt = data.split(" ");
+        for (String att : pathAtt) {
+            Attibute attibute = new Attibute();
+            if (att.indexOf("=") != -1) {
+                attibute.setName(att.split("=")[0]);
+                attibute.setValue(att.split("=")[1]);
+                AttList.add(attibute);
+            }
+
+        }
+
+        return AttList;
+    }
+
+    private int checkPrefixTagIndex(String data, String tagname) {
+        String temp = data;
+        // System.out.println("temp : "+temp);
+        // System.out.println("temp  index: "+temp.indexOf(tagname));
+        int g = data.lastIndexOf(START_PREFIXTAG, temp.indexOf(tagname));
+        //System.out.println("g : "+g);
+        if (g == -1) {
+            return -1;
+        }
+
+        if (temp.substring(g, temp.indexOf(tagname)).trim().equalsIgnoreCase(START_PREFIXTAG)) {
+
+            return g;
+        }
+        return -1;
     }
 
     public List<String> ScanMethodFromFile(String pathFile) {
